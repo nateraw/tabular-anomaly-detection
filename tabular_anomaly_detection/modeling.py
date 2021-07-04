@@ -1,5 +1,5 @@
 from argparse import Namespace
-from typing import Union, List, Tuple
+from typing import List, Tuple, Union
 
 import torch.nn.functional as F
 from huggingface_hub import ModelHubMixin
@@ -7,7 +7,6 @@ from torch import nn
 
 
 class Dense(nn.Module):
-
     def __init__(self, input_dim, output_dim, bias=True, activation=nn.LeakyReLU, **kwargs):
         super().__init__()
         self.fc = nn.Linear(input_dim, output_dim, bias=bias)
@@ -26,8 +25,9 @@ class Encoder(nn.Module):
         super().__init__()
         dims = (input_dim,) + dims
         self.layers = nn.Sequential(
-            *[Dense(dims[i], dims[i+1], negative_slope=0.4, inplace=True) for i in range(len(dims) - 1)]
+            *[Dense(dims[i], dims[i + 1], negative_slope=0.4, inplace=True) for i in range(len(dims) - 1)]
         )
+
     def forward(self, x):
         return self.layers(x)
 
@@ -39,5 +39,6 @@ class Decoder(nn.Module):
             *[Dense(dims[i], dims[i + 1], negative_slope=0.4, inplace=True) for i in range(len(dims) - 1)]
             + [Dense(dims[-1], output_dim, activation=None)]
         )
+
     def forward(self, x):
         return self.layers(x)

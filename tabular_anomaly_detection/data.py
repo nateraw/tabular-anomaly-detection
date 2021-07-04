@@ -1,12 +1,11 @@
+import numpy as np
 import torch
 from pyarrow.compute import min_max
-import numpy as np
 from torch import optim
 from torch.utils.data import DataLoader
 
 
 class TabularFeatureExtractor:
-
     def __init__(self, categorical_columns, numeric_columns, label_column=None):
         self.categorical_columns = categorical_columns
         self.numeric_columns = numeric_columns
@@ -34,7 +33,6 @@ class TabularFeatureExtractor:
         self.min_max_map = min_max_map
         self.min_max_map_scaled = min_max_map_scaled
 
-
         num_cat_feats_per_col = [len(_map) for col, _map in self.col_to_id.items()]
         num_cat_feats_compounding = []
         for i, n in enumerate(num_cat_feats_per_col):
@@ -61,11 +59,11 @@ class TabularFeatureExtractor:
             example[col] = [_map[x] for x in example[col]]
 
         encodings = {}
-        encodings['categorical_features'] = list(zip(*(example[c] for c in self.categorical_columns)))
-        encodings['numeric_features'] = list(zip(*(example[c] for c in self.numeric_columns)))
+        encodings["categorical_features"] = list(zip(*(example[c] for c in self.categorical_columns)))
+        encodings["numeric_features"] = list(zip(*(example[c] for c in self.numeric_columns)))
 
         if self.label_column is not None:
-            encodings['labels'] = [self.label_to_id[x] for x in example[self.label_column]]
+            encodings["labels"] = [self.label_to_id[x] for x in example[self.label_column]]
 
         return encodings
 
@@ -73,21 +71,21 @@ class TabularFeatureExtractor:
 class TabularCollator:
     def __init__(self, feature_extractor):
         self.feature_extractor = feature_extractor
-    
+
     def __call__(self, batch):
 
         # Categorical IDs to Multi-One-Hot
-        cat_features = torch.LongTensor([ex['categorical_features'] for ex in batch])
+        cat_features = torch.LongTensor([ex["categorical_features"] for ex in batch])
         cat_features[:, 1:] += torch.tensor(self.feature_extractor.num_cat_feats_compounding[:-1])
 
         # TODO - There's probably a more efficient way to do this...
         cat_features = torch.nn.functional.one_hot(cat_features, num_classes=self.feature_extractor.total_cat_feats)
         cat_features = cat_features.sum(1)
 
-        numeric_features = torch.tensor([ex['numeric_features'] for ex in batch])
+        numeric_features = torch.tensor([ex["numeric_features"] for ex in batch])
 
         # HACK - This never returns
         if self.feature_extractor.label_column is not None:
-            labels = torch.tensor([ex['labels'] for ex in batch])
+            labels = torch.tensor([ex["labels"] for ex in batch])
 
         return cat_features.float(), numeric_features
