@@ -1,0 +1,6 @@
+torch
+pytorch-lightning
+matplotlib
+numpy
+datasets>=1.7.0
+huggingface-hub
