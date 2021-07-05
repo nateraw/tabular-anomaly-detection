@@ -9,7 +9,7 @@ from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
 
 from tabular_anomaly_detection import (
-    AdversarialAutoencoder,
+    AdversarialAutoencoderLightning,
     LatentSpaceVisualizationCallback,
     TabularCollator,
     TabularFeatureExtractor,
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         collate_fn=TabularCollator(feature_extractor),
     )
 
-    model = AdversarialAutoencoder(feature_extractor.feature_dim)
+    model = AdversarialAutoencoderLightning(feature_extractor.feature_dim)
 
     if args.use_wandb:
         args.logger = WandbLogger(name=f"{datetime.now()}", project="fin-anomaly")

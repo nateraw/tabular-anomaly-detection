@@ -18,7 +18,7 @@ from .modeling import Decoder, Encoder
 logger = logging.getLogger(__name__)
 
 
-class AdversarialAutoencoder(pl.LightningModule, ModelHubMixin):
+class AdversarialAutoencoderLightning(pl.LightningModule, ModelHubMixin):
     def __init__(
         self,
         input_dim,

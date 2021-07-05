@@ -140,3 +140,4 @@ cython_debug/
 *.ckpt
 lightning_logs/
 fraud_dataset_v2.csv
+outputs/
